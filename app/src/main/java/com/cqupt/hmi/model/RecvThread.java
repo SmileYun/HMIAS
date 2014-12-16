@@ -21,7 +21,9 @@ public class RecvThread {
 
     private SegmentMsgHandler mSenter = null;
 
-
+    private int nowLevel = CanMsgCache.Segment.LEVEL.SAFE.getLevel();
+    
+    
     public RecvThread(BluetoothSocket mBluetoothSocket) {
         this.mBluetoothSocket = mBluetoothSocket;
     }
@@ -57,8 +59,10 @@ public class RecvThread {
                         CanMsgCache.Segment _s = mHandler.handlerRawCanMsg(mCanMsgCharBuffer);
                         //存
                         mCanMsgCache.update(_s);
-                        //通知
-                        mSenter.handlerMsg(_s);
+                        //高于当前级别则通知
+                        if(_s.getLevel() >= nowLevel){
+                            mSenter.handlerMsg(_s);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -104,4 +108,7 @@ public class RecvThread {
         this.mSenter = handler;
     }
 
+    public void setNowLevel(int nowLevel) {
+        this.nowLevel = nowLevel;
+    }
 }

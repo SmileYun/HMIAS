@@ -142,6 +142,8 @@ public class Dispatcher implements SegmentMsgHandler {
         public void run() {
             Segment _s = mRecvThread.queryHighLevelReturnSg();
             notifyUI(_s);
+            if (_s != null)
+                mRecvThread.setNowLevel(_s.getLevel());
         }
     }
 

@@ -62,12 +62,19 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     @CCIoCView(id = R.id.connection, onClick = "connectionClick")
     private ImageView mConnection;
 
+    private int Voice_Value = 100;
+
+    private boolean isSilence = false;
+
+    private Timer mTimer;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setMainContentView(R.layout.threaten_layout);
         mHandler = new Handler(this);
-
+        mConnection.setVisibility(View.VISIBLE);
     }
 
     // 蓝牙连接
@@ -122,18 +129,60 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 0, 0, "搜索设备");
-        menu.add(0, 1, 1, "退出程序");
+//        menu.add(0, 0, 0, "搜索设备");
+//        menu.add(0, 1, 1, "退出程序");
+//        menu.add(0, 2, 2, "静音");
+//        return super.onCreateOptionsMenu(menu);
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+//        MenuInflater inflater = getMenuInflater();
+//
+//        getLayoutInflater().setFactory(new LayoutInflater.Factory() {
+//            @Override
+//            public View onCreateView(String name, Context context, AttributeSet attrs) {
+//                if (name.equalsIgnoreCase("com.android.internal.view.menu.IconMenuItemView")
+//                        || name.equalsIgnoreCase("com.android.internal.view.menu.ActionMenuItemView")) {
+//                    try {
+//                        LayoutInflater f = getLayoutInflater();
+//                        final View view = f.createView(name, null, attrs);
+//                        System.out.println((view instanceof TextView));
+//                        if (view instanceof TextView) {
+//                            ((TextView) view).setTextColor(Color.WHITE);
+//                        }
+//                        return view;
+//                    } catch (InflateException e) {
+//                        e.printStackTrace();
+//                    } catch (ClassNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                return null;
+//            }
+//
+//        });
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
+
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == 0) {
+        if (item.getItemId() ==  R.id.serch) {
             connectBlueth();
-        } else if (item.getItemId() == 1) {
+        } else if (item.getItemId() == R.id.exit) {
             exitApp();
+        } else if (item.getItemId() ==  R.id.silence) {
+            if (!isSilence) {
+                isSilence = true;
+                setVoice_Value(0);
+            } else {
+                isSilence = false;
+                setVoice_Value(100);
+            }
         }
+
+
         return true;
     }
 
@@ -166,7 +215,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
         display_2.setImageBitmap(BitmapFactory.decodeResource(getResources(), RImgID_2)); // 闪烁的图片
 
         if (mToneGenerator == null) {
-            mToneGenerator = new ToneGenerator(RVoiceId, VOICE_LEVEL);
+            mToneGenerator = new ToneGenerator(RVoiceId, Voice_Value);
         }
 
         if (mTimer != null) {
@@ -178,8 +227,6 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
         mTimer.scheduleAtFixedRate(new BlinkingImgView(), 0, 500);
     }
 
-    private Timer mTimer;
-
     private class BlinkingImgView extends TimerTask {
         private boolean isFlag = false;
 
@@ -188,6 +235,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
             if (isFlag) {
                 isFlag = false;
                 mHandler.obtainMessage(VISIBLE).sendToTarget();
+                mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 400);
             } else {
                 isFlag = true;
                 mHandler.obtainMessage(IMVISIBLE).sendToTarget();
@@ -225,7 +273,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 RidImg_1 = b.getInt("BMAP1");
                 RidImg_2 = b.getInt("BMAP2");
                 time = b.getInt("time");
-                
+
                 if (nowScence != RidImg_1 && RidImg_1 != 0) {
                     nowScence = RidImg_1;
                     mDynamicView.setVisibility(View.GONE);
@@ -299,5 +347,10 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
 
     public void myUpdate(Object data) {
         mHandler.obtainMessage(CONNBTNVISIBLE).sendToTarget();
+    }
+
+    public void setVoice_Value(int voice_Value) {
+        Voice_Value = voice_Value;
+        mToneGenerator = new ToneGenerator(VOICE_LEVEL, voice_Value);
     }
 }

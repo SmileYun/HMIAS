@@ -95,18 +95,18 @@ public class DynamicView extends SurfaceView implements Callback {
     private void drawDynamicView(Canvas canvas, Bundle moreInfo) {
         if (moreInfo.getInt("BMAP1") != nowBitmapResID) {
             nowBitmap = loadOptiBitmap(moreInfo.getInt("BMAP1", 0));
-            Point[] _positions = (Point[]) moreInfo.getParcelableArray("locations");
-            if (_positions != null) {
-                for (int i = 0; i < _positions.length; i++) {
-                    //if (positions == null)
-                    positions = new Point[_positions.length];
-                    positions[i] = _positions[i];
-                }
-            } else {
-                positions = null;
-            }
         }
         drawBackground(canvas, nowBitmap);
+        Point[] _positions = (Point[]) moreInfo.getParcelableArray("locations");
+        if (_positions != null) {
+            positions = new Point[_positions.length];
+            for (int i = 0; i < _positions.length; i++) {
+                //if (positions == null)
+                positions[i] = _positions[i];
+            }
+        } else {
+            positions = null;
+        }
         if (positions != null) {
             drawText(canvas, positions, paints);
         }
