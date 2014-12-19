@@ -8,8 +8,8 @@ public class SegmentToCanMsgInfo {
 
     public static CanMsgInfo segmentToCanMsgInfo(CanMsgCache.Segment segment) {
         CanMsgInfo canMsgInfo = new CanMsgInfo(segment);
-        canMsgInfo.setId(segment.getCanID());
-        canMsgInfo.setData(segment.getData());
+//        canMsgInfo.setId(segment.getCanID());
+//        canMsgInfo.setData(segment.getData());
         return canMsgInfo;
     }
 

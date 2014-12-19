@@ -2,6 +2,7 @@ package com.cqupt.hmi.model;
 
 
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
 import com.cqupt.hmi.model.threaten.CanMsgCache;
 
@@ -22,8 +23,8 @@ public class RecvThread {
     private SegmentMsgHandler mSenter = null;
 
     private int nowLevel = CanMsgCache.Segment.LEVEL.SAFE.getLevel();
-    
-    
+
+
     public RecvThread(BluetoothSocket mBluetoothSocket) {
         this.mBluetoothSocket = mBluetoothSocket;
     }
@@ -55,12 +56,12 @@ public class RecvThread {
                         --looper_recv;
                     }
                     looper_recv = 10;
-                    if(mHandler != null){
+                    if (mHandler != null) {
                         CanMsgCache.Segment _s = mHandler.handlerRawCanMsg(mCanMsgCharBuffer);
                         //存
                         mCanMsgCache.update(_s);
                         //高于当前级别则通知
-                        if(_s.getLevel() >= nowLevel){
+                        if (_s.getLevel() >= nowLevel & _s.getLevel() != CanMsgCache.Segment.LEVEL.SAFE.getLevel()) {
                             mSenter.handlerMsg(_s);
                         }
                     }
@@ -71,31 +72,29 @@ public class RecvThread {
         }
     };
 
-    public HashMap<String, Object> queryHighLevel(){
+    public HashMap<String, Object> queryHighLevel() {
         HashMap<String, Object> _m;
         _m = mCanMsgCache.queryHighLevel();
         return _m;
     }
 
-    public CanMsgCache.Segment queryHighLevelReturnSg(){
-        CanMsgCache.Segment _s;
+    public CanMsgCache.Segment queryHighLevelReturnSg() {
+        CanMsgCache.Segment _s = null;
         _s = mCanMsgCache.queryHighLevelReturnSg();
         return _s;
     }
 
     /**
-     *
-     * @Description   处理原始信息以存入缓存
+     * @Description 处理原始信息以存入缓存
      */
-    public interface RawCanMsgHandler{
+    public interface RawCanMsgHandler {
         CanMsgCache.Segment handlerRawCanMsg(char[] mCanMsgCharBuffer);
     }
 
     /**
-     *
-     * @Description   接到信息后通知
+     * @Description 接到信息后通知
      */
-    public interface SegmentMsgHandler{
+    public interface SegmentMsgHandler {
         void handlerMsg(CanMsgCache.Segment sg);
     }
 

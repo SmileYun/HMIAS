@@ -12,6 +12,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -49,7 +51,10 @@ public class DynamicView extends SurfaceView implements Callback {
 
     private int mScreenW, mScreenH;
 
-
+    private ToneGenerator mToneGenerator;
+    
+    
+    
     public DynamicView(Context context) {
         this(context, null);
     }
@@ -95,7 +100,12 @@ public class DynamicView extends SurfaceView implements Callback {
     private void drawDynamicView(Canvas canvas, Bundle moreInfo) {
         if (moreInfo.getInt("BMAP1") != nowBitmapResID) {
             nowBitmap = loadOptiBitmap(moreInfo.getInt("BMAP1", 0));
+            if (mToneGenerator == null) {
+                mToneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 120);
+            }
+            mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 500);
         }
+        
         drawBackground(canvas, nowBitmap);
         Point[] _positions = (Point[]) moreInfo.getParcelableArray("locations");
         if (_positions != null) {
@@ -129,7 +139,7 @@ public class DynamicView extends SurfaceView implements Callback {
             if (p != null) {
                 String textDraw = info.getInt(AppContant.TEXT_STR_DRAWTEXT[factor]) + "";
                 float textDrawLen = text[factor].measureText(textDraw);
-                canvas.drawText(textDraw + factor, p.x - textDrawLen, p.y, text[factor]);
+                canvas.drawText(textDraw, p.x - textDrawLen/1.27f, p.y, text[factor]);
                 factor++;
             }
         }

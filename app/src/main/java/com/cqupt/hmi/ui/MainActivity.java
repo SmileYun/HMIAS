@@ -26,6 +26,7 @@ import com.cqupt.hmi.core.ioc.CCIoCView;
 import com.cqupt.hmi.core.util.AnimationUtils;
 import com.cqupt.hmi.entity.CanMsgInfo;
 import com.cqupt.hmi.model.bluetoothconn.BluetoothConn;
+import com.cqupt.hmi.model.threaten.CanMsgCache;
 import com.cqupt.hmi.persenter.Dispatcher;
 import com.cqupt.hmi.ui.base.HMIActivity;
 import com.cqupt.hmi.ui.widget.DynamicView;
@@ -129,37 +130,6 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        menu.add(0, 0, 0, "搜索设备");
-//        menu.add(0, 1, 1, "退出程序");
-//        menu.add(0, 2, 2, "静音");
-//        return super.onCreateOptionsMenu(menu);
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-//        MenuInflater inflater = getMenuInflater();
-//
-//        getLayoutInflater().setFactory(new LayoutInflater.Factory() {
-//            @Override
-//            public View onCreateView(String name, Context context, AttributeSet attrs) {
-//                if (name.equalsIgnoreCase("com.android.internal.view.menu.IconMenuItemView")
-//                        || name.equalsIgnoreCase("com.android.internal.view.menu.ActionMenuItemView")) {
-//                    try {
-//                        LayoutInflater f = getLayoutInflater();
-//                        final View view = f.createView(name, null, attrs);
-//                        System.out.println((view instanceof TextView));
-//                        if (view instanceof TextView) {
-//                            ((TextView) view).setTextColor(Color.WHITE);
-//                        }
-//                        return view;
-//                    } catch (InflateException e) {
-//                        e.printStackTrace();
-//                    } catch (ClassNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                return null;
-//            }
-//
-//        });
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
 
@@ -168,11 +138,11 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() ==  R.id.serch) {
+        if (item.getItemId() == R.id.serch) {
             connectBlueth();
         } else if (item.getItemId() == R.id.exit) {
             exitApp();
-        } else if (item.getItemId() ==  R.id.silence) {
+        } else if (item.getItemId() == R.id.silence) {
             if (!isSilence) {
                 isSilence = true;
                 setVoice_Value(0);
@@ -182,7 +152,6 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
             }
         }
 
-
         return true;
     }
 
@@ -190,10 +159,17 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
         System.exit(0);
     }
 
+
+    private boolean isOneLevel = true;
+
     @Override
     public void show(Bundle b) {
         if (b.getInt("bitmap_or_surfaceview") == CanMsgInfo.DISPLAYTYPE.BITMAP.ordinal()) {
             Message msg = mHandler.obtainMessage(TYPE_BITMAP);
+            if (b.getInt("TIME") == 500)
+                isOneLevel = true;
+            else
+                isOneLevel = false;
             msg.setData(b);
             msg.sendToTarget();
         } else if (b.getInt("bitmap_or_surfaceview") == CanMsgInfo.DISPLAYTYPE.SURFACEVIEW.ordinal()) {
@@ -215,7 +191,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
         display_2.setImageBitmap(BitmapFactory.decodeResource(getResources(), RImgID_2)); // 闪烁的图片
 
         if (mToneGenerator == null) {
-            mToneGenerator = new ToneGenerator(RVoiceId, Voice_Value);
+            mToneGenerator = new ToneGenerator(RVoiceId, Voice_Value);//VOICE_LEVEL == RVoiceId
         }
 
         if (mTimer != null) {
@@ -235,8 +211,14 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
             if (isFlag) {
                 isFlag = false;
                 mHandler.obtainMessage(VISIBLE).sendToTarget();
-                mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 400);
+                if (isOneLevel)
+                    mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 500);
+                else
+                    mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200);
+
             } else {
+                if (!isOneLevel)
+                    mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 200);
                 isFlag = true;
                 mHandler.obtainMessage(IMVISIBLE).sendToTarget();
             }
@@ -279,21 +261,31 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                     mDynamicView.setVisibility(View.GONE);
                     displayImg(RidImg_1, RidImg_2, VOICE_LEVEL, time);
                 }
+
+                if (b.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel())
+                    stop();
+
                 break;
 
             case TYPE_SURFACE:
                 mDynamicView.setVisibility(View.VISIBLE);
-                display_1.setVisibility(View.GONE);
-                display_2.setVisibility(View.GONE);
-                mDynamicView.updateSV(msg.getData());
+                mHandler.obtainMessage(STOPTIMER).sendToTarget();
+                Bundle sb = msg.getData();
+                mDynamicView.updateSV(sb);
+                if (sb.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel())
+                    stop();
                 break;
 
-            case VISIBLE:
+            case VISIBLE: //图片闪烁
+                if (mDynamicView.getVisibility() == View.VISIBLE)
+                    mDynamicView.setVisibility(View.GONE);
                 display_1.setVisibility(View.VISIBLE);
                 display_2.setVisibility(View.VISIBLE);
                 break;
 
             case IMVISIBLE:
+                if (mDynamicView.getVisibility() == View.VISIBLE)
+                    mDynamicView.setVisibility(View.GONE);
                 display_1.setVisibility(View.VISIBLE);
                 display_2.setVisibility(View.INVISIBLE);
                 break;

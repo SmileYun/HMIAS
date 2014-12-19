@@ -42,7 +42,7 @@ public class SVHandler extends Dispatcher.AbHandler {
     public Bundle response(CanMsgInfo cinfo) {
         Bundle bd = new Bundle();
         bd.putInt("bitmap_or_surfaceview", LEVEL.ordinal());
-
+        bd.putInt("DisplayLevel", cinfo.getmDisplayType());
         byte[] info = cinfo.getData();
         //报警级别
         int alaLevel = info[0] % 4;
@@ -53,7 +53,7 @@ public class SVHandler extends Dispatcher.AbHandler {
         // 最小引导速度
         int minSpeed = (info[2] & 0x7f);
         // 当前行车速度
-        int currentSpeed = (info[5] & 0xff);
+        int currentSpeed = (info[3] & 0xff);
         // 剩余时间
         int remainTime = (info[6] & 0x7f);
         // 危险点距离本车距离
@@ -157,6 +157,7 @@ public class SVHandler extends Dispatcher.AbHandler {
         ps[0].y = (int) (yValue * HMIActivity.mScreenHeight);
         bundle.putInt("AUDIO", audio);
         bundle.putInt("TIME", time);
+        bundle.putInt(AppContant.TEXT_STR_DRAWTEXT[0], distance);
         bundle.putParcelableArray("locations", ps);
         return bundle;
     }

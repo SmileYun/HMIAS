@@ -8,6 +8,8 @@ public class CanMsgInfo {
 
     private byte[] mData; // 8
 
+    private int mDisplayType = Segment.LEVEL.SAFE.getLevel();
+    
     public static enum DISPLAYTYPE{BITMAP, SURFACEVIEW, UNKNOW}
 
 
@@ -16,6 +18,7 @@ public class CanMsgInfo {
     public CanMsgInfo(Segment info) {
         mCanID = info.getCanID();
         mData = info.getData();
+        mDisplayType = info.getLevel();
     }
 
     public CanMsgInfo(int id, byte[] data) {
@@ -67,9 +70,10 @@ public class CanMsgInfo {
                 _type=DISPLAYTYPE.SURFACEVIEW;
                 break;
         }
-
         return _type;
     }
 
-
+    public int getmDisplayType() {
+        return mDisplayType;
+    }
 }

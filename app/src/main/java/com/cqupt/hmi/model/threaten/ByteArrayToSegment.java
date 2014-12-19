@@ -1,5 +1,7 @@
 package com.cqupt.hmi.model.threaten;
 
+import android.util.Log;
+
 import com.cqupt.hmi.model.RecvThread.RawCanMsgHandler;
 import com.cqupt.hmi.model.threaten.CanMsgCache.Segment;
 import com.cqupt.hmi.model.threaten.CanMsgCache.Segment.LEVEL;
@@ -40,15 +42,15 @@ public class ByteArrayToSegment implements RawCanMsgHandler {
             _level = LEVEL.MIDDLE;
         } else if (mCanMsgCharBuffer[0] == 0x21 && isAlarmScence(mCanMsgCharBuffer)) {
             _level = LEVEL.LOW;
-        } else if (isSafeScence(mCanMsgCharBuffer)) {
+        } else {// if (isSafeScence(mCanMsgCharBuffer)) {
             _level = LEVEL.SAFE;
         }
         return _level;
     }
 
     private int getCanId(char[] mCanMsgCharBuffer) {
-        int canId = 0;
-        canId = mCanMsgCharBuffer[0]>>2 + mCanMsgCharBuffer[1];
+        int canId = new Integer(0);
+        canId = (mCanMsgCharBuffer[1] << 8) + mCanMsgCharBuffer[0];
         return canId;
     }
 
@@ -77,5 +79,4 @@ public class ByteArrayToSegment implements RawCanMsgHandler {
             return false;
         }
     }
-
 }

@@ -91,7 +91,6 @@ public class CanMsgCache {
                 return;
             }
         }
-        // synchronized (mCache) {
         lock.writeLock().lock();
         try {
             HashMap<String, Object> m = mCache.get(level);
@@ -107,13 +106,11 @@ public class CanMsgCache {
         if (s.getLevel() < 0 || s.getLevel() > maxID) {
             try {
                 throw new CCAppException("id out of bound ! pleas check!");
-
             } catch (CCAppException e) {
                 e.printStackTrace();
                 return;
             }
         }
-        // synchronized (mCache) {
         lock.writeLock().lock();
         try {
             HashMap<String, Object> m = mCache.get(s.getLevel());
@@ -202,7 +199,8 @@ public class CanMsgCache {
                         l = LEVEL.SAFE;
                         break;
                 }
-                _s.setLevel(l);
+                if (l != LEVEL.SAFE)
+                    _s.setLevel(l);
                 _s.setCanID((Integer) m.get("canID"));
                 _s.setData((byte[]) m.get("data"));
                 update(i, (Integer) m.get("canID"), (byte[]) m.get("data"), 0);

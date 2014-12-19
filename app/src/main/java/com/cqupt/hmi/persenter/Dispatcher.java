@@ -131,6 +131,10 @@ public class Dispatcher implements SegmentMsgHandler {
         public abstract Bundle response(CanMsgInfo info);
     }
 
+    /**
+     * 实现 RecvThread接口
+     * @param sg
+     */
     @Override
     public void handlerMsg(Segment sg) {
         notifyUI(sg);
@@ -142,8 +146,9 @@ public class Dispatcher implements SegmentMsgHandler {
         public void run() {
             Segment _s = mRecvThread.queryHighLevelReturnSg();
             notifyUI(_s);
-            if (_s != null)
-                mRecvThread.setNowLevel(_s.getLevel());
+            if (_s != null) {
+                //mRecvThread.setNowLevel(_s.getLevel());
+            }
         }
     }
 

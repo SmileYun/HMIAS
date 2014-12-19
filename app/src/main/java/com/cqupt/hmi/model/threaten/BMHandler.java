@@ -60,6 +60,7 @@ public class BMHandler extends Dispatcher.AbHandler {
     @Override
     public Bundle response(CanMsgInfo cinfo) {
         Bundle bd = new Bundle();
+        bd.putInt("DisplayLevel", cinfo.getmDisplayType());
         byte[] info = cinfo.getData();
         int alaLevel = info[0] & 0x03;
         int dir = (info[4] >> 6) & 0x03;
@@ -101,8 +102,7 @@ public class BMHandler extends Dispatcher.AbHandler {
 
                     bundlePutInt(bd, RID1[6], RID2[6], AUDIO, LEVEL2TIME);
 
-                } else if (alaLevel == 0x02
-                        && dir == 0x02) {
+                } else if (alaLevel == 0x02 && dir == 0x02) {
 
                     bundlePutInt(bd, RID1[7], RID2[7], AUDIO, LEVEL2TIME);
 

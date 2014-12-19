@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,7 @@ public class BluetoothConn extends Observable {
         public void run() {
             /* 开始搜索 */
             mBluetoothAdapter.startDiscovery();
+            Log.d("--DiscoveryBluetoothDevice->", "BluetoothAdapter.startDiscovery()");
             for (; ; ) {
                 if (mIsDiscoveryFinished) {
                     /* TODO 搜索完成 */
@@ -147,11 +149,11 @@ public class BluetoothConn extends Observable {
     public void cancleDiscovery() {
         mBluetoothAdapter.cancelDiscovery();
     }
-    
-    public interface Update{
+
+    public interface Update {
         void myUpdate(Object data);
     }
-    
+
     private Update obs;
 
     public void setObs(Update obs) {
