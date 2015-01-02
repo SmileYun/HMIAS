@@ -2,7 +2,6 @@ package com.cqupt.hmi.model;
 
 
 import android.bluetooth.BluetoothSocket;
-import android.util.Log;
 
 import com.cqupt.hmi.model.threaten.CanMsgCache;
 
@@ -64,6 +63,7 @@ public class RecvThread {
                         if (_s.getLevel() >= nowLevel & _s.getLevel() != CanMsgCache.Segment.LEVEL.SAFE.getLevel()) {
                             mSenter.handlerMsg(_s);
                         }
+                        
                     }
                 }
             } catch (Exception e) {

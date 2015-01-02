@@ -139,7 +139,8 @@ public class BluetoothConn extends Observable {
         public void onReceive(Context context, Intent intent) {
             mIsBTConnection = false;
             notifyObservers(mIsBTConnection);
-            obs.myUpdate(mIsBTConnection);
+            if (obs != null)
+                obs.myUpdate(mIsBTConnection);
         }
     }
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.cqupt.hmi.app.AppContant;
 import com.cqupt.hmi.core.util.SegmentToCanMsgInfo;
 import com.cqupt.hmi.entity.CanMsgInfo;
 import com.cqupt.hmi.entity.CanMsgInfo.DISPLAYTYPE;
@@ -133,6 +134,7 @@ public class Dispatcher implements SegmentMsgHandler {
 
     /**
      * 实现 RecvThread接口
+     *
      * @param sg
      */
     @Override
@@ -157,13 +159,17 @@ public class Dispatcher implements SegmentMsgHandler {
         if (sg != null) {
             info = SegmentToCanMsgInfo.segmentToCanMsgInfo(sg);
             Bundle _b = mBMAbHandler.handleMessage(info);
+
+            if (sg.getCanID() == 0x541) //判断是否有541 报文
+                _b.putBoolean(AppContant.HAS_541_SAFE, true);
+
             if (_b != null) {
                 mContentView.show(_b);
             } else {
                 mContentView.stop();
             }
-        }else {
-           mContentView.stop();
+        } else {
+            mContentView.stop();
         }
     }
 
