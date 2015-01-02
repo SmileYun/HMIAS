@@ -5,6 +5,6 @@ package com.cqupt.hmi.app;
  */
 public class AppContant {
     public static final String[] TEXT_STR_DRAWTEXT = new String[]{"text1", "text2", "text3"};
-    
+    public static final String HAS_541_SAFE = "HAS_541_SAFE";
     
 }

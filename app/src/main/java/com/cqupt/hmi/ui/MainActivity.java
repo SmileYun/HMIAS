@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cqupt.hmi.R;
+import com.cqupt.hmi.app.AppContant;
 import com.cqupt.hmi.core.ioc.CCIoCView;
 import com.cqupt.hmi.core.util.AnimationUtils;
 import com.cqupt.hmi.entity.CanMsgInfo;
@@ -55,6 +56,9 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
 
     @CCIoCView(id = R.id.surface)
     private DynamicView mDynamicView;
+
+    @CCIoCView(id = R.id.hasRecv)
+    private ImageView mHasRecv;
 
     private Handler mHandler;
 
@@ -262,9 +266,13 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                     displayImg(RidImg_1, RidImg_2, VOICE_LEVEL, time);
                 }
 
-                if (b.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel())
+                if (b.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel()) {
                     stop();
-
+                    if (b.getBoolean(AppContant.HAS_541_SAFE, false)) {
+                        //有541安全报文
+                        mHasRecv.setVisibility(View.VISIBLE);
+                    }
+                }
                 break;
 
             case TYPE_SURFACE:
@@ -272,8 +280,13 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 mHandler.obtainMessage(STOPTIMER).sendToTarget();
                 Bundle sb = msg.getData();
                 mDynamicView.updateSV(sb);
-                if (sb.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel())
+                if (sb.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel()) {
                     stop();
+                    if (sb.getBoolean(AppContant.HAS_541_SAFE, false)) {
+                        //有541安全报文
+                        mHasRecv.setVisibility(View.VISIBLE);
+                    }
+                }
                 break;
 
             case VISIBLE: //图片闪烁
@@ -295,7 +308,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
             case CONNBTNVISIBLE:
                 mConnection.setVisibility(View.VISIBLE);
                 break;
-            case STOPTIMER:
+            case STOPTIMER:   //停止定时器，停止闪烁
                 if (mTimer != null) {
                     mTimer.cancel();
                     mTimer = null;
