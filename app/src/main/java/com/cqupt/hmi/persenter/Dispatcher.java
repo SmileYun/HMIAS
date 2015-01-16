@@ -163,12 +163,17 @@ public class Dispatcher implements SegmentMsgHandler {
             if (sg.getCanID() == 0x541) //判断是否有541 报文
                 _b.putBoolean(AppContant.HAS_541_SAFE, true);
 
+            //收到信息
+            _b.putBoolean(AppContant.HAS_MESSAGE, true);
+            
             if (_b != null) {
                 mContentView.show(_b);
             } else {
+                //非定义报文返回
                 mContentView.stop();
             }
         } else {
+            //没有报文
             mContentView.stop();
         }
     }

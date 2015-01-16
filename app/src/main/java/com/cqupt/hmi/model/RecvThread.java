@@ -57,14 +57,14 @@ public class RecvThread {
                     looper_recv = 10;
                     if (mHandler != null) {
                         CanMsgCache.Segment _s = mHandler.handlerRawCanMsg(mCanMsgCharBuffer);
-                        //存
+                        //存储
                         mCanMsgCache.update(_s);
                         //高于当前级别则通知
                         if (_s.getLevel() >= nowLevel & _s.getLevel() != CanMsgCache.Segment.LEVEL.SAFE.getLevel()) {
                             mSenter.handlerMsg(_s);
                         }
-                        
                     }
+                    
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -78,6 +78,12 @@ public class RecvThread {
         return _m;
     }
 
+    /**
+     *
+     * 返回优先级别最高场景
+     *
+     * @return Segment, 如果不存在, 则返回null
+     */
     public CanMsgCache.Segment queryHighLevelReturnSg() {
         CanMsgCache.Segment _s = null;
         _s = mCanMsgCache.queryHighLevelReturnSg();

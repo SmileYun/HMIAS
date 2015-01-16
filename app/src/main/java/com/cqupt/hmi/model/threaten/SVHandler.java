@@ -13,7 +13,7 @@ import com.cqupt.hmi.ui.base.HMIActivity;
 
 public class SVHandler extends Dispatcher.AbHandler {
 
-    private static final CanMsgInfo.DISPLAYTYPE LEVEL = DISPLAYTYPE.SURFACEVIEW;
+    private static final DISPLAYTYPE LEVEL = DISPLAYTYPE.SURFACEVIEW;
 
     public SVHandler() {
         super(LEVEL);
@@ -64,13 +64,6 @@ public class SVHandler extends Dispatcher.AbHandler {
                 if (alaLevel == 0x01) {
 
                     bundlePutInt(bd, RID1[0], AUDIO, LEVEL1TIME);
-
-                }
-                break;
-            case 0x07:// uvr
-                if (alaLevel == 0x01) {
-
-                    bundlePutInt(bd, RID1[1], dgrDis, 0.53f, 0.655f, AUDIO, LEVEL1TIME);
 
                 }
                 break;
@@ -130,9 +123,10 @@ public class SVHandler extends Dispatcher.AbHandler {
 
                 }
                 break;
+            default:
+                bd = null;
+                break;
         }
-
-
         return bd;
     }
 

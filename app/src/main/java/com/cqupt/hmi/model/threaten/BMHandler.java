@@ -36,7 +36,8 @@ public class BMHandler extends Dispatcher.AbHandler {
             R.drawable.lcw_left,
             R.drawable.lcw_right,
             R.drawable.lcw_left,
-            R.drawable.lcw_right
+            R.drawable.lcw_right,
+            R.drawable.uvr
     };
     private static final int[] RID2 = new int[]{
             R.drawable.rew_1,
@@ -54,7 +55,8 @@ public class BMHandler extends Dispatcher.AbHandler {
             R.drawable.lcw_1_left,
             R.drawable.lcw_1_right,
             R.drawable.lcw_2_left,
-            R.drawable.lcw_2_right
+            R.drawable.lcw_2_right,
+            R.drawable.uvr_1
     };
 
     @Override
@@ -143,17 +145,20 @@ public class BMHandler extends Dispatcher.AbHandler {
 
                 } else if (alaLevel == 0x02
                         && dir == 0x01) {
-
                     bundlePutInt(bd, RID1[14], RID2[14], AUDIO, LEVEL2TIME);
-
                 } else if (alaLevel == 0x02
                         && dir == 0x02) {
-
                     bundlePutInt(bd, RID1[15], RID2[15], AUDIO, LEVEL2TIME);
-
                 }
                 break;
-
+            case 0x07:// uvr
+                if (alaLevel == 0x01) {
+                    bundlePutInt(bd, RID1[16], RID2[16], AUDIO, LEVEL1TIME);
+                }
+                break;
+            default:
+                bd = null;
+                break;
         }
         return bd;
     }

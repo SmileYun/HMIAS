@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cqupt.hmi.R;
-import com.cqupt.hmi.app.AppContant;
 import com.cqupt.hmi.core.ioc.CCIoCView;
 import com.cqupt.hmi.core.util.AnimationUtils;
 import com.cqupt.hmi.entity.CanMsgInfo;
@@ -168,6 +167,9 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
 
     @Override
     public void show(Bundle b) {
+        //收到报文
+        mHandler.obtainMessage(HAS_MSG).sendToTarget();
+        
         if (b.getInt("bitmap_or_surfaceview") == CanMsgInfo.DISPLAYTYPE.BITMAP.ordinal()) {
             Message msg = mHandler.obtainMessage(TYPE_BITMAP);
             if (b.getInt("TIME") == 500)
@@ -231,7 +233,11 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
 
     @Override
     public void stop() {
-        if (mDynamicView.getVisibility() == View.VISIBLE || mHasRecv.getVisibility() == View.VISIBLE)
+        if((mDynamicView.getVisibility() == View.GONE || display_1.getVisibility() == View.GONE) && mHasRecv.getVisibility() == View.GONE)
+           mHandler.obtainMessage(HAS_NO_MSG).sendToTarget();
+        
+//        if (mDynamicView.getVisibility() == View.VISIBLE || mHasRecv.getVisibility() == View.VISIBLE)
+        if (mDynamicView.getVisibility() == View.VISIBLE)
             mHandler.obtainMessage(123).sendToTarget();
 
         if (display_1.getVisibility() == View.VISIBLE)
@@ -247,6 +253,8 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     public static final int CONNBTNVISIBLE = 6;
     public static final int STOPTIMER = 7;
     public static final int ISSAFE = 8;
+    public static final int HAS_MSG = 9;//收到报文
+    public static final int HAS_NO_MSG = 10;//收到报文
     private static final int VOICE_LEVEL = AudioManager.STREAM_MUSIC;
     private int nowScence = -1;
 
@@ -255,6 +263,8 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
         switch (msg.what) {
             case TYPE_BITMAP:
                 Bundle b = msg.getData();
+                if (b == null)
+                    break;
                 int RidImg_1, RidImg_2, time;
                 RidImg_1 = b.getInt("BMAP1");
                 RidImg_2 = b.getInt("BMAP2");
@@ -267,17 +277,17 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 }
 
                 if (b.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel()) {
-
-                    if (b.getBoolean(AppContant.HAS_541_SAFE, false)) {
-                        //有541安全报文
-                        mHasRecv.setVisibility(View.VISIBLE);
-                        mHandler.obtainMessage(ISSAFE).sendToTarget();
-                        //TODO 重复代码
-                        if (display_1.getVisibility() == View.VISIBLE)
-                            mHandler.obtainMessage(STOPTIMER).sendToTarget();
-                    } else {
-                        stop();
-                    }
+// 该段代码为 在收到541安全报文时，在界面显示
+//                    if (b.getBoolean(AppContant.HAS_541_SAFE, false)) {
+//                        //有541安全报文
+//                        mHasRecv.setVisibility(View.VISIBLE);
+//                        mHandler.obtainMessage(ISSAFE).sendToTarget();
+//                        //TODO 重复代码
+//                        if (display_1.getVisibility() == View.VISIBLE)
+//                            mHandler.obtainMessage(STOPTIMER).sendToTarget();
+//                    } else {
+//                        stop();
+//                    }
                 }
                 break;
 
@@ -285,20 +295,22 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 mDynamicView.setVisibility(View.VISIBLE);
                 mHandler.obtainMessage(STOPTIMER).sendToTarget();
                 Bundle sb = msg.getData();
+                if (sb == null)
+                    break;
                 mDynamicView.updateSV(sb);
                 if (sb.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel()) {
-
-                    if (sb.getBoolean(AppContant.HAS_541_SAFE, false)) {
-                        //有541安全报文
-                        mHasRecv.setVisibility(View.VISIBLE);
-                        mHandler.obtainMessage(ISSAFE).sendToTarget();
-                        //TODO 重复代码
-                        if (display_1.getVisibility() == View.VISIBLE)
-                            mHandler.obtainMessage(STOPTIMER).sendToTarget();
-                    } else {
-                        stop();
-                    }
-                }
+// 该段代码为 在收到541安全报文时，在界面显示
+//                if (sb.getBoolean(AppContant.HAS_541_SAFE, false)) {
+//                    //有541安全报文
+//                    mHasRecv.setVisibility(View.VISIBLE);
+//                    mHandler.obtainMessage(ISSAFE).sendToTarget();
+//                    //TODO 重复代码
+//                    if (display_1.getVisibility() == View.VISIBLE)
+//                        mHandler.obtainMessage(STOPTIMER).sendToTarget();
+//                } else {
+//                    stop();
+//                }
+            }
                 break;
 
             case VISIBLE: //图片闪烁
@@ -316,9 +328,11 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 break;
             case CONNBTNINVISIBLE:
                 mConnection.setVisibility(View.GONE);
+                mHasRecv.setVisibility(View.VISIBLE);
                 break;
             case CONNBTNVISIBLE:
                 mConnection.setVisibility(View.VISIBLE);
+                mHasRecv.setVisibility(View.GONE);
                 break;
             case STOPTIMER:   //停止定时器，停止闪烁
                 if (mTimer != null) {
@@ -334,11 +348,18 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 display_2.setVisibility(View.GONE);
                 mDynamicView.setVisibility(View.GONE);
                 break;
+            case HAS_MSG:   //接受到报文
+                mHasRecv.setVisibility(View.GONE);
+                break;
+            case HAS_NO_MSG:   //未接受到报文
+                mHasRecv.setVisibility(View.VISIBLE);
+                break;
             default:
                 display_1.setVisibility(View.GONE);
                 display_2.setVisibility(View.GONE);
                 mDynamicView.setVisibility(View.GONE);
-                mHasRecv.setVisibility(View.GONE);
+//                mHasRecv.setVisibility(View.GONE);
+//                m
                 break;
         }
         return true; //信息都在此处理
