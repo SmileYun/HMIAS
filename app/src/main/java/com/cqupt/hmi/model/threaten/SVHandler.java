@@ -59,6 +59,7 @@ public class SVHandler extends Dispatcher.AbHandler {
         // 危险点距离本车距离
         int dgrDis = (((info[4] & 0x03) << 8) + (info[5] & 0xff));
 
+        bd.putInt(AppContant.SCENCE, ((info[0] & 0xfc) >> 2));
         switch (((info[0] & 0xfc) >> 2)) {
             case 0x04: //cb
                 if (alaLevel == 0x01) {

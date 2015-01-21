@@ -12,7 +12,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
-import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +24,7 @@ import android.view.SurfaceView;
 
 import com.cqupt.hmi.R;
 import com.cqupt.hmi.app.AppContant;
+import com.cqupt.hmi.ui.MainActivity;
 import com.cqupt.hmi.ui.base.HMIActivity;
 
 
@@ -100,10 +100,11 @@ public class DynamicView extends SurfaceView implements Callback {
     private void drawDynamicView(Canvas canvas, Bundle moreInfo) {
         if (moreInfo.getInt("BMAP1") != nowBitmapResID) {
             nowBitmap = loadOptiBitmap(moreInfo.getInt("BMAP1", 0));
-            if (mToneGenerator == null) {
-                mToneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 120);
-            }
-            mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 500);
+            /*    响一声代码- -   */
+//            if (mToneGenerator == null) {
+//                mToneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 120);
+//            }
+//            mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 500);
         }
         
         drawBackground(canvas, nowBitmap);
@@ -168,7 +169,7 @@ public class DynamicView extends SurfaceView implements Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-//        mHandler = null;
+            ((MainActivity)mContext).setmScence(-1);
     }
 
     private Bitmap loadOptiBitmap(int resId) {

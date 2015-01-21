@@ -23,7 +23,7 @@ public class CanMsgCache {
 
         mCache = new ConcurrentHashMap<Integer, HashMap<String, Object>>();
         for (int i = 1; i <= capacity; i++) {
-            HashMap<String, Object> hm = new HashMap<String, Object>();
+            HashMap<String, Object> hm = new HashMap<>();
             hm.put("canID", new byte[2]);
             hm.put("data", new byte[8]);
             hm.put("flag", 0);
@@ -228,15 +228,12 @@ public class CanMsgCache {
         }
     }
 
-    /*
-     * 
+    /**
      * 		    +--------------------------+
      * Segment	| id | canId | data | flag |
      * 		    |--------------------------| 
      * 		    | id | HashMap<Str,Object> |
      * 			+--------------------------+
-     * 
-     * 
      */
     public static final class Segment {
 

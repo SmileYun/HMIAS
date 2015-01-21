@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cqupt.hmi.R;
+import com.cqupt.hmi.app.AppContant;
 import com.cqupt.hmi.core.ioc.CCIoCView;
 import com.cqupt.hmi.core.util.AnimationUtils;
 import com.cqupt.hmi.entity.CanMsgInfo;
@@ -71,6 +72,8 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     private boolean isSilence = false;
 
     private Timer mTimer;
+
+    private int mScence = -1;
 
 
     @Override
@@ -168,8 +171,9 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     @Override
     public void show(Bundle b) {
         //收到报文
-        mHandler.obtainMessage(HAS_MSG).sendToTarget();
-        
+        if (b.getBoolean(AppContant.HAS_MESSAGE))
+            mHandler.obtainMessage(HAS_MSG).sendToTarget();
+
         if (b.getInt("bitmap_or_surfaceview") == CanMsgInfo.DISPLAYTYPE.BITMAP.ordinal()) {
             Message msg = mHandler.obtainMessage(TYPE_BITMAP);
             if (b.getInt("TIME") == 500)
@@ -233,9 +237,9 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
 
     @Override
     public void stop() {
-        if((mDynamicView.getVisibility() == View.GONE || display_1.getVisibility() == View.GONE) && mHasRecv.getVisibility() == View.GONE)
-           mHandler.obtainMessage(HAS_NO_MSG).sendToTarget();
-        
+        if ((mDynamicView.getVisibility() == View.GONE || display_1.getVisibility() == View.GONE) && mHasRecv.getVisibility() == View.GONE)
+            mHandler.obtainMessage(HAS_NO_MSG).sendToTarget();
+
 //        if (mDynamicView.getVisibility() == View.VISIBLE || mHasRecv.getVisibility() == View.VISIBLE)
         if (mDynamicView.getVisibility() == View.VISIBLE)
             mHandler.obtainMessage(123).sendToTarget();
@@ -257,7 +261,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     public static final int HAS_NO_MSG = 10;//收到报文
     private static final int VOICE_LEVEL = AudioManager.STREAM_MUSIC;
     private int nowScence = -1;
-
+    private Timer VOICE = null;
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -288,6 +292,8 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
 //                    } else {
 //                        stop();
 //                    }
+                    stop();
+                    mHandler.obtainMessage(HAS_MSG).sendToTarget();
                 }
                 break;
 
@@ -298,6 +304,16 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 if (sb == null)
                     break;
                 mDynamicView.updateSV(sb);
+                if (mScence != sb.getInt(AppContant.SCENCE)) {
+                    mScence = sb.getInt(AppContant.SCENCE);
+                    if (mToneGenerator == null)
+                        mToneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 80);
+                    
+                    VOICE = new Timer();
+                    VOICE.schedule(new VOICE(), 0, 1000);
+                            
+                }
+
                 if (sb.getInt("DisplayLevel") == CanMsgCache.Segment.LEVEL.SAFE.getLevel()) {
 // 该段代码为 在收到541安全报文时，在界面显示
 //                if (sb.getBoolean(AppContant.HAS_541_SAFE, false)) {
@@ -310,7 +326,9 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
 //                } else {
 //                    stop();
 //                }
-            }
+                    stop();
+                    mHandler.obtainMessage(HAS_MSG).sendToTarget();
+                }
                 break;
 
             case VISIBLE: //图片闪烁
@@ -396,5 +414,21 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     public void setVoice_Value(int voice_Value) {
         Voice_Value = voice_Value;
         mToneGenerator = new ToneGenerator(VOICE_LEVEL, voice_Value);
+    }
+    
+    private class VOICE extends TimerTask{
+        int count = 0;
+        
+        @Override
+        public void run() {
+            mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 500);
+            count++;
+            if (count > 2)
+                this.cancel();
+        }
+    }
+
+    public void setmScence(int mScence) {
+        this.mScence = mScence;
     }
 }

@@ -11,9 +11,9 @@
 
         <ImageView
             android:id="@+id/hasRecv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/hasrecv"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="#1333559f"
             android:layout_margin="20dp"
             android:visibility="gone"
             />
