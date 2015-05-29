@@ -32,10 +32,9 @@ public class CanMsgCache {
     }
 
     /**
-     *
      * 缓存默认大小为 4
-     * @return
-     * CanMsgCache  实例
+     *
+     * @return CanMsgCache  实例
      */
     public static CanMsgCache getCacheInstance() {
         if (mInstanceCache == null) {
@@ -49,11 +48,10 @@ public class CanMsgCache {
     }
 
     /**
+     * 指定缓存大小
      *
-     * 指定缓存大小 
      * @param capacity
-     * @return
-     * CanMsgCache 实例
+     * @return CanMsgCache 实例
      */
     public static CanMsgCache getCacheInstance(int capacity) {
         if (mInstanceCache == null) {
@@ -67,18 +65,13 @@ public class CanMsgCache {
     }
 
     /**
-     *
      * 根据CanMsg 数据和标志位更新缓存表
      *
-     * @param level
-     *         		要更新的级别  <p/>
-     *            {@code LEVEL.HIGH, LEVEL.MIDDLE, LEVEL.LOW, LEVEL.SAFE} <br>by</br> {@code getLevel()}
-     * @param canID
-     *            帧ID
-     * @param data
-     *            数据
-     * @param flag
-     *            标志位
+     * @param level 要更新的级别  <p/>
+     *              {@code LEVEL.HIGH, LEVEL.MIDDLE, LEVEL.LOW, LEVEL.SAFE} <br>by</br> {@code getLevel()}
+     * @param canID 帧ID
+     * @param data  数据
+     * @param flag  标志位
      * @param
      */
     public void update(int level, int canID, byte[] data, int flag) {
@@ -123,7 +116,6 @@ public class CanMsgCache {
     }
 
     /**
-     *
      * 根据id 查询 值
      *
      * @param id
@@ -142,7 +134,6 @@ public class CanMsgCache {
     }
 
     /**
-     *
      * 返回优先级别最高场景
      *
      * @return HashMap<String,Object>, 如果不存在, 则返回null
@@ -167,7 +158,6 @@ public class CanMsgCache {
     }
 
     /**
-     *
      * 返回优先级别最高场景
      *
      * @return Segment, 如果不存在, 则返回null
@@ -229,11 +219,12 @@ public class CanMsgCache {
     }
 
     /**
-     * 		    +--------------------------+
-     * Segment	| id | canId | data | flag |
-     * 		    |--------------------------| 
-     * 		    | id | HashMap<Str,Object> |
-     * 			+--------------------------+
+     * <table border="1" >
+     * 　<caption><em>Structure of Segment</em></caption>
+     * 　<tr><th rowspan="1"><th colspan="1">structure
+     * 　<tr><th>Segment<td> {@code id | canId | data | flag}
+     * 　<tr><th>get<td> {@code id |  HashMap<String,Object> }
+     * </table>
      */
     public static final class Segment {
 
@@ -245,10 +236,11 @@ public class CanMsgCache {
 
         private int flag = 0;
 
-        public static enum LEVEL{
+        public static enum LEVEL {
             HIGH, MIDDLE, LOW, SAFE;
-            public int getLevel(){
-                return this.ordinal()+1;
+
+            public int getLevel() {
+                return this.ordinal() + 1;
             }
         }
 
@@ -277,7 +269,7 @@ public class CanMsgCache {
         }
 
         public int getLevel() {
-            return level.ordinal()+1;
+            return level.ordinal() + 1;
         }
 
         public void setLevel(LEVEL level) {

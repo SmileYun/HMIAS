@@ -23,7 +23,7 @@ public class SVHandler extends Dispatcher.AbHandler {
     private static final int LEVEL2TIME = 200;
     private static final int AUDIO = AudioManager.STREAM_ALARM;
     //{推荐速度，当前速度，时间,}X
-    private static final float[] SGX = new float[]{0.402f, 0.48f, 0.18f, 0.402f, 0.48f, 0.478f, 0.402f, 0.48f, 0.77f};
+    private static final float[] SGX = new float[]{0.428f, 0.46f, 0.23f, 0.428f, 0.46f, 0.489f, 0.428f, 0.46f, 0.8f};
     private static final float[] SGY = new float[]{0.595f, 0.692f, 0.439f, 0.595f, 0.692f, 0.439f, 0.595f, 0.692f, 0.439f};
     private static final int[] RID1 = new int[]{
             R.drawable.cb,
@@ -101,7 +101,7 @@ public class SVHandler extends Dispatcher.AbHandler {
             case 0x0a:// ojr
                 if (alaLevel == 0x01) {
 
-                    bundlePutInt(bd, RID1[6], dgrDis, 0.586f, 0.675f, AUDIO, LEVEL1TIME);
+                    bundlePutInt(bd, RID1[6], dgrDis, 0.588f, 0.630f, AUDIO, LEVEL1TIME);
 
                 }
                 break;
@@ -116,11 +116,11 @@ public class SVHandler extends Dispatcher.AbHandler {
             case 0x0c:// cpp
                 if (alaLevel == 0x01) {
 
-                    bundlePutInt(bd, RID1[8], dgrDis, 0.485f, 0.732f, AUDIO, LEVEL1TIME);
+                    bundlePutInt(bd, RID1[8], dgrDis, 0.637f, 0.737f, AUDIO, LEVEL1TIME);
 
                 } else if (alaLevel == 0x02) {
 
-                    bundlePutInt(bd, RID1[9], dgrDis, 0.485f, 0.732f, AUDIO, LEVEL2TIME);
+                    bundlePutInt(bd, RID1[9], dgrDis, 0.637f, 0.737f, AUDIO, LEVEL2TIME);
 
                 }
                 break;

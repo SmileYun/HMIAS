@@ -67,7 +67,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     @CCIoCView(id = R.id.connection, onClick = "connectionClick")
     private ImageView mConnection;
 
-    private int Voice_Value = 100;
+    private int Voice_Value = 80;
 
     private boolean isSilence = false;
 
@@ -138,8 +138,6 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
-
-
     }
 
     @Override
@@ -199,7 +197,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     private void displayImg(int RImgID_1, int RImgID_2, int RVoiceId, int time) {
         display_1.setImageBitmap(BitmapFactory.decodeResource(getResources(), RImgID_1)); // 后面一张不动的图片
         display_2.setImageBitmap(BitmapFactory.decodeResource(getResources(), RImgID_2)); // 闪烁的图片
-
+//        Log.e("------bm>", RImgID_1 +"||" + RImgID_2);
         if (mToneGenerator == null) {
             mToneGenerator = new ToneGenerator(RVoiceId, Voice_Value);//VOICE_LEVEL == RVoiceId
         }
@@ -272,10 +270,11 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 int RidImg_1, RidImg_2, time;
                 RidImg_1 = b.getInt("BMAP1");
                 RidImg_2 = b.getInt("BMAP2");
+                
                 time = b.getInt("time");
 
-                if (nowScence != RidImg_1 && RidImg_1 != 0) {
-                    nowScence = RidImg_1;
+                if (nowScence != RidImg_2 && RidImg_2 != 0) {
+                    nowScence = RidImg_2;
                     mDynamicView.setVisibility(View.GONE);
                     displayImg(RidImg_1, RidImg_2, VOICE_LEVEL, time);
                 }

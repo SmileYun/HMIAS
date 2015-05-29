@@ -39,7 +39,7 @@ public class BluetoothConn extends Observable {
         IntentFilter _DeviceFoundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         IntentFilter _DisConnStateFilter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
 
-        mDeviceFound = new DeviceFound();
+        mDeviceFound = new DeviceFoundBR();
         mDisConnectState = new DisConnectState();
         mDiscoveryFinished = new DiscoveryFinished();
         this.mContext.registerReceiver(mDeviceFound, _DeviceFoundFilter);
@@ -69,7 +69,7 @@ public class BluetoothConn extends Observable {
         public void run() {
             /* 开始搜索 */
             mBluetoothAdapter.startDiscovery();
-            Log.d("--DiscoveryBluetoothDevice->", "BluetoothAdapter.startDiscovery()");
+            Log.d("--BluetoothConn->", "DiscoveryBluetoothDevice - >BluetoothAdapter.startDiscovery()");
             for (; ; ) {
                 if (mIsDiscoveryFinished) {
                     /* TODO 搜索完成 */
@@ -102,7 +102,7 @@ public class BluetoothConn extends Observable {
 
     }
 
-    private final class DeviceFound extends BroadcastReceiver {
+    private final class DeviceFoundBR extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
