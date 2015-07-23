@@ -35,7 +35,11 @@ public class SVHandler extends Dispatcher.AbHandler {
             R.drawable.ojr,
             R.drawable.ahs,
             R.drawable.cpp_1,
-            R.drawable.cpp_2
+            R.drawable.cpp_2,
+            R.drawable.cb_left1, //10
+            R.drawable.cb_left2,
+            R.drawable.cb_rihgt1,
+            R.drawable.cb_rihgt2
     };
 
     @Override
@@ -48,6 +52,9 @@ public class SVHandler extends Dispatcher.AbHandler {
         int alaLevel = info[0] % 4;
         //信号灯颜色
         int color = (info[4] >> 4) & 0x03;
+        //威胁来源方向    0x01 left 
+        int sourceOrientation = (info[4] >> 6) & 0x03;
+        
         // 最大引导速度
         int maxSpeed = (info[1] & 0x7f);
         // 最小引导速度
@@ -63,16 +70,20 @@ public class SVHandler extends Dispatcher.AbHandler {
         switch (((info[0] & 0xfc) >> 2)) {
             case 0x04: //cb
                 if (alaLevel == 0x01) {
-
-                    bundlePutInt(bd, RID1[0], AUDIO, LEVEL1TIME);
-
+                    if(sourceOrientation == 0x01)//left
+                        bundlePutInt(bd, RID1[10], alaLevel, AUDIO, LEVEL1TIME);
+                    else if(sourceOrientation == 0x02)//right
+                        bundlePutInt(bd, RID1[12], alaLevel, AUDIO, LEVEL1TIME);
+                }else if (alaLevel == 0x02) {
+                    if(sourceOrientation == 0x01)//left
+                        bundlePutInt(bd, RID1[11], alaLevel, AUDIO, LEVEL2TIME);
+                    else if(sourceOrientation == 0x02)//right
+                        bundlePutInt(bd, RID1[13], alaLevel, AUDIO, LEVEL2TIME);
                 }
                 break;
             case 0x08:// dsr
                 if (alaLevel == 0x01) {
-
                     bundlePutInt(bd, RID1[2], AUDIO, LEVEL1TIME);
-
                 }
                 break;
             case 0x09:// sg
@@ -131,8 +142,7 @@ public class SVHandler extends Dispatcher.AbHandler {
         return bd;
     }
 
-    //方法重载：
-    //方法一：CB、DSR、AHS使用此方法
+    //DSR、AHS使用此方法
     private Bundle bundlePutInt(Bundle bundle, int bmapID1, int audio, int time) {
         bundle.putInt("BMAP1", bmapID1);
         bundle.putInt("AUDIO", audio);
@@ -141,7 +151,17 @@ public class SVHandler extends Dispatcher.AbHandler {
         return bundle;
     }
 
-    //方法二：UVR、OJR、CPP使用此方法
+    //CB
+    private Bundle bundlePutInt(Bundle bundle, int bmapID1, int level, int audio, int time) {
+        bundle.putInt("BMAP1", bmapID1);
+        bundle.putInt("AUDIO", audio);
+        bundle.putInt("TIME", time);
+        bundle.putInt("LEVEL", level);
+        bundle.putParcelableArray("locations", null);
+        return bundle;
+    }
+    
+    //UVR、OJR、CPP使用此方法
     private Bundle bundlePutInt(Bundle bundle, int bmapID1, int distance, float xValue, float yValue, int audio, int time) {
         Point[] ps = new Point[1];
         ps[0] = new Point();
@@ -157,7 +177,7 @@ public class SVHandler extends Dispatcher.AbHandler {
         return bundle;
     }
 
-    //方法三：SG使用此方法
+    //SG使用此方法
     private Bundle bundlePutInt(Bundle bundle, int bmapID1, int maxSpeed, float maxSpeedX, float maxSpeedY,
                                 int currentSpeed, float currentSpeedX, float currentSpeedY,
                                 int remainTime, float TimeX, float TimeY, int audio, int time) {

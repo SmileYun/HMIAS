@@ -31,13 +31,13 @@ public class BMHandler extends Dispatcher.AbHandler {
             R.drawable.icw_right,
             R.drawable.cfcw,
             R.drawable.cfcw,
-            R.drawable.dnpw,
+            R.drawable.dnpw,    //10
             R.drawable.dnpw,
             R.drawable.lcw_left,
             R.drawable.lcw_right,
             R.drawable.lcw_left,
             R.drawable.lcw_right,
-            R.drawable.uvr
+            R.drawable.uvr,
     };
     private static final int[] RID2 = new int[]{
             R.drawable.rew_1,
@@ -56,7 +56,7 @@ public class BMHandler extends Dispatcher.AbHandler {
             R.drawable.lcw_1_right,
             R.drawable.lcw_2_left,
             R.drawable.lcw_2_right,
-            R.drawable.uvr_1
+            R.drawable.uvr_1,
     };
 
     @Override

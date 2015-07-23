@@ -206,6 +206,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
             mTimer.cancel();
             mTimer = null;
         }
+        
         mHandler.obtainMessage().sendToTarget();
         mTimer = new Timer();
         mTimer.scheduleAtFixedRate(new BlinkingImgView(), 0, 500);
@@ -259,7 +260,9 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     public static final int HAS_NO_MSG = 10;//收到报文
     private static final int VOICE_LEVEL = AudioManager.STREAM_MUSIC;
     private int nowScence = -1;
-    private Timer VOICE = null;
+    private Timer VOICE = null;//报警声音
+    
+    
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -273,6 +276,11 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 
                 time = b.getInt("time");
 
+                if(VOICE != null){
+                    VOICE.cancel();
+                    VOICE = null;
+                }
+                
                 if (nowScence != RidImg_2 && RidImg_2 != 0) {
                     nowScence = RidImg_2;
                     mDynamicView.setVisibility(View.GONE);
@@ -303,10 +311,34 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 if (sb == null)
                     break;
                 mDynamicView.updateSV(sb);
-                if (mScence != sb.getInt(AppContant.SCENCE)) {
+
+                if(mScence != sb.getInt(AppContant.SCENCE) && sb.getInt(AppContant.SCENCE) == 0x04){
+                    mScence = sb.getInt(AppContant.SCENCE);
+                    int level = sb.getInt("LEVEL");
+
+                    if(VOICE != null){
+                        VOICE.cancel();
+                        VOICE = null;
+                    }
+                    
+                    if(level == 0x01)
+                        level = 0x01;    
+                    else if(level == 0x02) {
+                        if (mToneGenerator == null)
+                            mToneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 80);
+                       
+                        VOICE = new Timer();
+                        VOICE.schedule(new VOICE(200, Integer.MAX_VALUE), 0, 400);
+                    }
+                }else if (mScence != sb.getInt(AppContant.SCENCE)) {
                     mScence = sb.getInt(AppContant.SCENCE);
                     if (mToneGenerator == null)
                         mToneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 80);
+
+                    if(VOICE != null){
+                        VOICE.cancel();
+                        VOICE = null;
+                    }
                     
                     VOICE = new Timer();
                     VOICE.schedule(new VOICE(), 0, 1000);
@@ -376,7 +408,7 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
                 display_2.setVisibility(View.GONE);
                 mDynamicView.setVisibility(View.GONE);
 //                mHasRecv.setVisibility(View.GONE);
-//                m
+
                 break;
         }
         return true; //信息都在此处理
@@ -417,12 +449,24 @@ public class MainActivity extends HMIActivity implements Callback, Observer, Blu
     
     private class VOICE extends TimerTask{
         int count = 0;
+        int duration = 500;
+        
+        public VOICE(){}
+        
+        public VOICE(int duration){
+            this.duration = duration;
+        }
+
+        public VOICE(int duration, int count){
+            this.count = count;
+            this.duration = duration;
+        }
         
         @Override
         public void run() {
-            mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 500);
-            count++;
-            if (count > 2)
+            mToneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, duration);
+            count--;
+            if (count < 0)
                 this.cancel();
         }
     }

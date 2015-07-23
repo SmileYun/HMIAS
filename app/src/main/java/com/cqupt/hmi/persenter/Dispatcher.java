@@ -164,7 +164,8 @@ public class Dispatcher implements SegmentMsgHandler {
                 _b.putBoolean(AppContant.HAS_541_SAFE, true);
 
             //收到信息
-            _b.putBoolean(AppContant.HAS_MESSAGE, true);
+            if (_b != null)
+                _b.putBoolean(AppContant.HAS_MESSAGE, true);
             
             if (_b != null) {
                 mContentView.show(_b);
